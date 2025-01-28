@@ -19,6 +19,32 @@ const url = require('url');
 //////////////
 //SERVER
 
+const replaceTemplate = (temp, product) => {
+  let output = temp.replace(/{%PRODUCTNAME%}/g, product.productName);
+  output = output.replace(/{%IMAGE%}/g, product.image);
+  output = output.replace('{%PRICE%}', product.price);
+  output = output.replace('{%FROM%}', product.from);
+  output = output.replace('{%NUTRIENTS%}', product.nutrients);
+  output = output.replace('{%QUANTITY%}', product.quantity);
+  output = output.replace('{%DESCRIPTION%}', product.description);
+  output = output.replace('{%ID%}', product.id);
+
+  if (!product.organic)
+    output = output.replace('{%NOT_ORGANIC%}', 'not-organic');
+
+  return output;
+};
+
+const tempOverview = fs.readFileSync(
+  `${__dirname}/template-overview.html`,
+  'utf-8'
+);
+const tempCard = fs.readFileSync(`${__dirname}/template-card.html`, 'utf-8');
+const tempProduct = fs.readFileSync(
+  `${__dirname}/template-product.html`,
+  'utf-8'
+);
+
 const data = fs.readFileSync(`${__dirname}/data.json`, 'utf-8');
 const dataOjb = JSON.parse(data);
 
@@ -27,7 +53,15 @@ const server = http.createServer((req, res) => {
 
   // overview page
   if (pathName === '/' || pathName === '/overview') {
-    res.end('this is the overView');
+    res.writeHead(200, { 'content-type': 'text/html' });
+
+    const cardHtml = dataOjb
+      .map((el) => replaceTemplate(tempCard, el))
+      .join('');
+
+    const output = tempOverview.replace('{%PRODUCT_CARDS%}', cardHtml);
+
+    res.end(output);
 
     // product page
   } else if (pathName === '/product') {
