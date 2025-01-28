@@ -19,12 +19,18 @@ const url = require('url');
 //////////////
 //SERVER
 
+const data = fs.readFileSync(`${__dirname}/data.json`, 'utf-8');
+const dataOjb = JSON.parse(data);
+
 const server = http.createServer((req, res) => {
   console.log(req.url);
   if (req.url === '/overview') {
     res.end('this is the overView');
   } else if (req.url === '/') {
     res.end('hello from the server home page.');
+  } else if (req.url === '/api') {
+    res.writeHead(200, { 'content-type': 'application/json' });
+    res.end(data);
   } else {
     res.writeHead(404, {
       'content-type': 'text/html',
