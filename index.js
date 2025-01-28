@@ -1,5 +1,6 @@
 const fs = require('fs');
 const http = require('http');
+const url = require('url');
 
 //////////////
 //FILE
@@ -19,7 +20,18 @@ const http = require('http');
 //SERVER
 
 const server = http.createServer((req, res) => {
-  res.end('hello from the server.');
+  console.log(req.url);
+  if (req.url === '/overview') {
+    res.end('this is the overView');
+  } else if (req.url === '/') {
+    res.end('hello from the server home page.');
+  } else {
+    res.writeHead(404, {
+      'content-type': 'text/html',
+      'my-header': 'something of the header',
+    });
+    res.end('<h1>page not found</h1>');
+  }
 });
 
 //          port  ,   host
