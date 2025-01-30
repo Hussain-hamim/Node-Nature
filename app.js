@@ -21,14 +21,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// ROUTE HANDLERS
-
-// mounting router
+// mounting routers
 app.use('/api/v1/tours', tourRouter); // create a small sub system for each resources
 app.use('/api/v1/users', userRouter);
 
-// START SEVER
-const port = 3000;
-app.listen(port, () => {
-  console.log(`server listening on port ${port}`);
-});
+module.exports = app;
