@@ -128,19 +128,18 @@ const deleteUser = (req, res) => {
 };
 
 // ROUTES
-app.route('/api/v1/tours').get(getAllTour).post(createTour);
-app
-  .route('/api/v1/tours/:id')
-  .get(getTour)
-  .patch(updateTour)
-  .delete(deleteTour);
+const tourRouter = express.Router();
+const userRouter = express.Router();
 
-app.route('/api/v1/users').get(getAllUsers).post(createUser);
-app
-  .route('/api/v1/users/:id')
-  .get(getUser)
-  .patch(updateUser)
-  .delete(deleteUser);
+tourRouter.route('/').get(getAllTour).post(createTour);
+tourRouter.route('/:id').get(getTour).patch(updateTour).delete(deleteTour);
+
+userRouter.route('/').get(getAllUsers).post(createUser);
+userRouter.route('/:id').get(getUser).patch(updateUser).delete(deleteUser);
+
+// mounting router
+app.use('/api/v1/tours', tourRouter); // create a small sub system for each resources
+app.use('/api/v1/users', userRouter);
 
 // START SEVER
 const port = 3000;
