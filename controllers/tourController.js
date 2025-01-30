@@ -8,6 +8,14 @@ exports.checkID = (req, res, next, val) => {
   if (req.params.id * 1 > tours.length) {
     return res.status(404).json({ status: 'fail', message: 'Invalid ID' });
   }
+  // this is param middleware if the val parameter dont exist then its normal middleware
+  next();
+};
+
+exports.checkBody = (req, res, next) => {
+  if (!req.body.name || !req.body.price) {
+    return res.status(400).json({ status: 'fail', message: 'bad request' });
+  }
 
   next();
 };
