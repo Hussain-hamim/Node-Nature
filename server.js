@@ -11,3 +11,7 @@ app.listen(port, () => {
   console.log(`server listening on port ${port}`);
   console.log('🙌');
 });
+
+const x = 24;
+
+x = 66;
