@@ -13,16 +13,16 @@ if (process.env.NODE_ENV === 'development') {
 app.use(express.json());
 app.use(express.static('./public'));
 
-app.use((req, res, next) => {
-  console.log('hello from middleware 🙌');
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log('hello from middleware 🙌');
+//   next();
+// });
 
-app.use((req, res, next) => {
-  req.requestTime = new Date().toISOString();
+// app.use((req, res, next) => {
+//   req.requestTime = new Date().toISOString();
 
-  next();
-});
+//   next();
+// });
 
 // mounting routers
 app.use('/api/v1/tours', tourRouter); // create a small sub system for each resources
