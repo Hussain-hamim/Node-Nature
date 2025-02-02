@@ -24,18 +24,27 @@ const Tour = require('./../models/tourModel');
 exports.getAllTour = async (req, res) => {
   try {
     // BUILD THE QUERY
-    // 1. filtering
+    // 1a. filtering
     const queryObj = { ...req.query };
     const excludedFields = ['page', 'sort', 'limit', 'fields']; // this fields will be excluded from the query param even if we specify
     excludedFields.forEach((el) => delete queryObj[el]);
 
-    // 2. advanced filtering
+    // 1b. advanced filtering
     let queryStr = JSON.stringify(queryObj); // filtering in querying
     // we take the query oject and add $ cuz that what query object give us except that we need $ to add to filter correctly in database e.g. {duration: {$gt: 5}}
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`); // we send query from postman like this: http://127.0.0.1:8000/api/v1/tours?duration[gt]=5&price[lt]=1500
 
     // const allTours = await Tour.find({ duration: 5, difficulty: 'easy' });
-    const query = Tour.find(JSON.parse(queryStr));
+    let query = Tour.find(JSON.parse(queryStr));
+
+    // 2. SORTING
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' '); // if someone send like; /api/v1/tours?sort=price,ratingAverage then we turn that , to space so sort become like this sort('price ratingsAverage')
+      query = query.sort(sortBy); // we can send req like this: .../api/tours?sort=price or -price for descending order
+      // sort(price ratingAverage)
+    } else {
+      query = query.sort('-createdAt');
+    }
 
     // const allTours = await Tour.find()
     //   .where('duration')
