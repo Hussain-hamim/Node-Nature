@@ -32,7 +32,7 @@ exports.getAllTour = async (req, res) => {
     // 2. advanced filtering
     let queryStr = JSON.stringify(queryObj); // filtering in querying
     // we take the query oject and add $ cuz that what query object give us except that we need $ to add to filter correctly in database e.g. {duration: {$gt: 5}}
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`); // we send query from postman like this: http://127.0.0.1:8000/api/v1/tours?duration[gt]=5&price[lt]=1500
 
     // const allTours = await Tour.find({ duration: 5, difficulty: 'easy' });
     const query = Tour.find(JSON.parse(queryStr));
