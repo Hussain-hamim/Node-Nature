@@ -31,6 +31,7 @@ exports.getAllTour = async (req, res) => {
 
     // 2. advanced filtering
     let queryStr = JSON.stringify(queryObj); // filtering in querying
+    // we take the query oject and add $ cuz that what query object give us except that we need $ to add to filter correctly in database e.g. {duration: {$gt: 5}}
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 
     // const allTours = await Tour.find({ duration: 5, difficulty: 'easy' });
