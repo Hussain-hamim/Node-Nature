@@ -23,12 +23,28 @@ const Tour = require('./../models/tourModel');
 
 exports.getAllTour = async (req, res) => {
   try {
-    const allTours = await Tour.find();
+    // BUILD THE QUERY
+    const queryObj = { ...req.query };
+    const excludedFields = ['page', 'sort', 'limit', 'fields']; // this fields will be excluded from the query param even if we specify
+    excludedFields.forEach((el) => delete queryObj[el]);
 
+    // const allTours = await Tour.find({ duration: 5, difficulty: 'easy' });
+    const query = Tour.find(queryObj);
+
+    // const allTours = await Tour.find()
+    //   .where('duration')
+    //   .equals(5)
+    //   .where('difficulty')
+    //   .equals('easy');
+
+    // EXECUTE THE QUERY
+    const tours = await query;
+
+    // SEND RESPONSE
     res.status(200).json({
       status: 'success',
-      results: allTours.length,
-      data: { tours: allTours },
+      results: tours.length,
+      data: { tours },
     });
   } catch (error) {
     res.status(400).json({
