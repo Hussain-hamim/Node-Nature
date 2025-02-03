@@ -55,7 +55,7 @@ exports.getAllTour = async (req, res) => {
     }
 
     // 4. PAGINATION
-    const page = req.query.page * 1 || 1;
+    const page = req.query.page * 1 || 1; // we also set default value
     const limit = req.query.limit * 1 || 100; // we multiply the query with 1 so that we convert the number in string passed to to number e.g. '1' * 1 = 1
     const skip = (page - 1) * limit; // prev page * limit = skip
 
