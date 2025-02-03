@@ -21,6 +21,13 @@ const Tour = require('./../models/tourModel');
 //   next();
 // };
 
+exports.aliasTopTours = (req, res, next) => {
+  req.query.limit = '5';
+  req.query.sort = '-ratingAverage,price';
+  req.query.fields = 'name,price,ratingAverage,summary,difficulty';
+  next();
+};
+
 exports.getAllTour = async (req, res) => {
   try {
     // BUILD THE QUERY
@@ -66,6 +73,9 @@ exports.getAllTour = async (req, res) => {
       const toursCount = await Tour.countDocuments();
       if (skip >= toursCount) throw new Error('this page does not exists.'); // we throw the error here so catch block will catch it
     }
+
+    // 5. ALIASING
+    //http://127.0.0.1:8000/api/v1/tours?limit=5&sort=-ratingAverage,price  // this query could be for top five tours
 
     // const allTours = await Tour.find()
     //   .where('duration')
