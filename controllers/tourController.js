@@ -54,6 +54,19 @@ exports.getAllTour = async (req, res) => {
       query = query.select('-__v');
     }
 
+    // 4. PAGINATION
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 100; // we multiply the query with 1 so that we convert the number in string passed to to number e.g. '1' * 1 = 1
+    const skip = (page - 1) * limit; // prev page * limit = skip
+
+    // page=3&limit=10 1-10 page 1, 11-20 page 2, 21-30 page 3
+    query = query.skip(skip).limit(limit);
+    // if we requested a page that do not exists:
+    if (req.query.page) {
+      const toursCount = await Tour.countDocuments();
+      if (skip >= toursCount) throw new Error('this page does not exists.'); // we throw the error here so catch block will catch it
+    }
+
     // const allTours = await Tour.find()
     //   .where('duration')
     //   .equals(5)
@@ -61,6 +74,7 @@ exports.getAllTour = async (req, res) => {
     //   .equals('easy');
 
     // EXECUTE THE QUERY
+
     const tours = await query;
 
     // SEND RESPONSE
