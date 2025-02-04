@@ -10,6 +10,8 @@ router
   .route('/top-5-cheap') // we just run a middleware before getting this alias router
   .get(tourController.aliasTopTours, tourController.getAllTour);
 
+router.route('/tour-stats').get(tourController.getTourStats);
+
 router
   .route('/')
   .get(tourController.getAllTour)

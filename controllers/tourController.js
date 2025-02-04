@@ -29,73 +29,6 @@ exports.aliasTopTours = (req, res, next) => {
   next();
 };
 
-// class APIFeatures {
-//   constructor(query, queryString) {
-//     this.query = query;
-//     this.queryString = queryString;
-//   }
-
-//   filter() {
-//     // 1a. filtering
-//     const queryObj = { ...this.queryString };
-//     const excludedFields = ['page', 'sort', 'limit', 'fields']; // this fields will be excluded from the query param even if we specify
-//     excludedFields.forEach((el) => delete queryObj[el]);
-
-//     // 1b. advanced filtering
-//     let queryStr = JSON.stringify(queryObj); // filtering in querying
-//     // we take the query oject and add $ cuz that what query object give us except that we need $ to add to filter correctly in database e.g. {duration: {$gt: 5}}
-//     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`); // we send query from postman like this: http://127.0.0.1:8000/api/v1/tours?duration[gt]=5&price[lt]=1500
-
-//     // const allTours = await Tour.find({ duration: 5, difficulty: 'easy' });
-//     this.query = this.query.find(JSON.parse(queryStr));
-//     // let query = Tour.find(JSON.parse(queryStr));
-
-//     return this;
-//   }
-
-//   sort() {
-//     // // 2. SORTING
-//     if (this.queryString.sort) {
-//       const sortBy = this.queryString.sort.split(',').join(' '); // if someone send like; /api/v1/tours?sort=price,ratingAverage then we turn that , to space so sort become like this sort('price ratingsAverage')
-//       this.query = this.query.sort(sortBy); // we can send req like this: .../api/tours?sort=price or -price for descending order
-//       // sort(price ratingAverage)
-//     } else {
-//       this.query = this.query.sort('-createdAt');
-//     }
-
-//     return this;
-//   }
-
-//   limitFields() {
-//     // 3. FIELDS
-//     if (this.queryString.fields) {
-//       const fields = this.queryString.fields.split(',').join(' ');
-//       this.query = this.query.select(fields);
-//     } else {
-//       this.query = this.query.select('-__v');
-//     }
-//     return this;
-//   }
-
-//   async paginate() {
-//     // 4. PAGINATION
-//     const page = this.queryString.page * 1 || 1; // we also set default value
-//     const limit = this.queryString.limit * 1 || 100; // we multiply the query with 1 so that we convert the number in string passed to to number e.g. '1' * 1 = 1
-//     const skip = (page - 1) * limit; // prev page * limit = skip
-
-//     // // page=3&limit=10 1-10 page 1, 11-20 page 2, 21-30 page 3
-//     // this.query = this.query.skip(skip).limit(limit);
-//     // // if we requested a page that do not exists:
-//     // if (this.queryString.page) {
-//     //   const toursCount = await Tour.countDocuments();
-//     //   if (skip >= toursCount) throw new Error('this page does not exists.'); // we throw the error here so catch block will catch it
-//     // }
-
-//     this.query = this.query.skip(skip).limit(limit);
-//     return this;
-//   }
-// }
-
 exports.getAllTour = async (req, res) => {
   try {
     // // BUILD THE QUERY
@@ -247,6 +180,42 @@ exports.deleteTour = async (req, res) => {
     });
   } catch (error) {
     res.status(400).json({
+      status: 'failed',
+      message: error,
+    });
+  }
+};
+
+exports.getTourStats = async (req, res) => {
+  try {
+    const stats = await Tour.aggregate([
+      { $match: { ratingAverage: { $gte: 4.5 } } },
+      {
+        $group: {
+          _id: { $toUpper: '$difficulty' },
+          // _id: '$ratingAverage',
+          numTours: { $sum: 1 },
+          numRating: { $sum: '$ratingQuantity' },
+          avgRating: { $avg: '$ratingAverage' },
+          avgPrice: { $avg: '$price' },
+          minPrice: { $min: '$price' },
+          maxPrice: { $max: '$price' },
+        },
+      },
+      {
+        $sort: { avgPrice: 1 },
+      },
+      // {
+      //   $match: { _id: { $ne: 'EASY' } }, // not equal
+      // },
+    ]);
+
+    res.status(200).json({
+      status: 'success',
+      data: stats,
+    });
+  } catch (error) {
+    res.status(404).json({
       status: 'failed',
       message: error,
     });
