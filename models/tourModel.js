@@ -54,6 +54,10 @@ tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
+tourSchema.virtual('uppName').get(function () {
+  return this.name.toUpperCase();
+});
+
 const Tour = mongoose.model('Tour', tourSchema);
 
 module.exports = Tour;
