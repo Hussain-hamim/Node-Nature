@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -7,6 +8,7 @@ const tourSchema = new mongoose.Schema(
       required: [true, 'a tour must have a name'],
       unique: true,
     },
+    slug: String,
     duration: {
       type: Number,
       required: [true, 'a tour must have a duration'],
@@ -45,6 +47,10 @@ const tourSchema = new mongoose.Schema(
       default: Date.now(),
       select: false,
     },
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
     startDates: [Date],
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
@@ -56,6 +62,30 @@ tourSchema.virtual('durationWeeks').get(function () {
 
 tourSchema.virtual('uppName').get(function () {
   return this.name.toUpperCase();
+});
+
+// document middleware or hooks
+tourSchema.pre('save', function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  next(); // this will run before we save doc to db
+});
+
+// tourSchema.post('save', function (doc, next) {
+//   // console.log(doc);// current saved doc
+//   console.log('doc successfully saved');
+//   next(); // this will run after doc saved to db
+// });
+
+// QUERY MIDDLEWARE
+tourSchema.pre(/^find/, function (next) {
+  this.find({ secretTour: { $ne: true } }); // by this the secret tour wont show
+  this.start = Date.now();
+  next();
+});
+
+tourSchema.post(/^find/, function (doc, next) {
+  console.log(`the query took ${Date.now() - this.start} milliseconds`);
+  next();
 });
 
 const Tour = mongoose.model('Tour', tourSchema);

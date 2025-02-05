@@ -239,12 +239,12 @@ exports.getMonthlyPlan = async (req, res) => {
       {
         $group: {
           _id: { $month: '$startDates' },
-          numTourStart: { $sum: 1 },
+          numTourStart: { $sum: 1 }, // count docs
           tours: { $push: '$name' },
         },
       },
-      { $addFields: { month: '$_id' } },
-      { $project: { _id: 0 } },
+      { $addFields: { month: '$_id' } }, // add field
+      { $project: { _id: 0 } }, // here we hide the _id field by 0
       { $sort: { numTourStart: -1 } },
       { $limit: 12 },
     ]);
