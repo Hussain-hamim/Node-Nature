@@ -91,6 +91,8 @@ exports.getAllTour = async (req, res) => {
     //   .limitFields()
     //   .paginate();
 
+    // this is a class and we have define its object here so we called all method in that class
+    // and every methods return THIS which mean that we can chain query on it, this class constructor take two args query and req query object
     const features = new APIFeatures(Tour.find(), req.query)
       .filter()
       .sort()
