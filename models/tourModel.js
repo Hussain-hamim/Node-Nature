@@ -88,6 +88,12 @@ tourSchema.post(/^find/, function (doc, next) {
   next();
 });
 
+tourSchema.pre('find', function (next) {
+  this.start = Date.now();
+  this.find({ secretTour: { $ne: true } });
+  next();
+});
+
 // AGGREGATE MIDDLEWARE
 tourSchema.pre('aggregate', function (next) {
   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } }); // we are removing from the output the vip tour with aggregate
