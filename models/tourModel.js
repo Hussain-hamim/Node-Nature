@@ -94,8 +94,10 @@ tourSchema.pre('find', function (next) {
   next();
 });
 
-// AGGREGATE MIDDLEWARE
+// AGGREGATE MIDDLEWARE: mongoose middleware or hook that allow to execute a fn before an aggregation pipeline is executed on model like before Tour.aggregate([])
+// this allow us to enhance the pipeline for all aggregation on the model
 tourSchema.pre('aggregate', function (next) {
+  // inside this fn we can access and modify the aggregation pipeline which is and array of stages
   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } }); // we are removing from the output the vip tour with aggregate
   next();
 });

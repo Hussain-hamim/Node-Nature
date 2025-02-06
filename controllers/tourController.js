@@ -77,6 +77,7 @@ exports.getAllTour = async (req, res) => {
 
     // // 5. ALIASING
     // //http://127.0.0.1:8000/api/v1/tours?limit=5&sort=-ratingAverage,price  // this query could be for top five tours
+    //http://127.0.0.1:8000/api/v1/tours?limit=5&sort=-ratingAverage,price ====> http://127.0.0.1:8000/api/v1/tours/top-five-tours
 
     // // const allTours = await Tour.find()
     // //   .where('duration')
@@ -134,7 +135,7 @@ exports.getTour = async (req, res) => {
 exports.createTour = async (req, res) => {
   try {
     // const newTour = new Tour({});
-    // newTour.save();
+    // newTour.save(); // create do this two line at the same time
     const newTour = await Tour.create(req.body);
 
     res.status(201).json({
@@ -188,6 +189,7 @@ exports.deleteTour = async (req, res) => {
   }
 };
 
+// aggregation pipeline [grouping, matching]:
 exports.getTourStats = async (req, res) => {
   try {
     const stats = await Tour.aggregate([
@@ -224,6 +226,7 @@ exports.getTourStats = async (req, res) => {
   }
 };
 
+// aggregation pipeline [unwind, grouping, matching]:
 exports.getMonthlyPlan = async (req, res) => {
   try {
     const year = req.params.year * 1;
@@ -242,11 +245,11 @@ exports.getMonthlyPlan = async (req, res) => {
         $group: {
           _id: { $month: '$startDates' },
           numTourStart: { $sum: 1 }, // count docs
-          tours: { $push: '$name' },
+          tours: { $push: '$name' }, // this create an array and push element to it
         },
       },
-      { $addFields: { month: '$_id' } }, // add field
-      { $project: { _id: 0 } }, // here we hide the _id field by 0
+      { $addFields: { month: '$_id' } }, // add field --- in _id field before we saved the startDates month
+      { $project: { _id: 0 } }, // here we hide the _id field by 0 // projecting is for like selecting
       { $sort: { numTourStart: -1 } },
       { $limit: 12 },
     ]);
