@@ -8,11 +8,13 @@ const sendErrorDev = (err, res) => {
 };
 
 const sendErrorProd = (err, res) => {
+  // operational
   if (err.isOperational) {
     res.status(err.statusCode).json({
       status: err.status,
       message: err.message,
     });
+    // programming or unknown
   } else {
     console.error('ERROR: 💥', err);
 
