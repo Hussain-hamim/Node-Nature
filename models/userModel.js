@@ -1,7 +1,7 @@
-const crypto = require('crypto');
+// const crypto = require('crypto');
 const mongoose = require('mongoose');
-const validator = require('validator');
-const bcrypt = require('bcryptjs');
+// const validator = require('validator');
+// const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Please provide your email'],
     unique: true,
     lowercase: true,
-    validate: [validator.isEmail, 'Please provide a valid email'],
+    // validate: [validator.isEmail, 'Please provide a valid email'],
   },
   photo: String,
   password: {
@@ -25,13 +25,13 @@ const userSchema = new mongoose.Schema({
   passwordConfirm: {
     type: String,
     required: [true, 'Please confirm your password'],
-    validate: {
-      // This only works on CREATE and SAVE!!!
-      validator: function (el) {
-        return el === this.password;
-      },
-      message: 'Passwords are not the same!',
-    },
+    // validate: {
+    //   // This only works on CREATE and SAVE!!!
+    //   validator: function (el) {
+    //     return el === this.password;
+    //   },
+    //   message: 'Passwords are not the same!',
+    // },
   },
 });
 
