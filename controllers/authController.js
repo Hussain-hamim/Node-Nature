@@ -1,10 +1,11 @@
 /* eslint-disable no-undef */
 const dotenv = require('dotenv');
 dotenv.config();
-const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const jwt = require('jsonwebtoken');
+const { promisify } = require('util');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -57,14 +58,12 @@ exports.login = async (req, res, next) => {
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) getting toke and check if its there
   let token;
-
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
   }
-
   if (!token) {
     return next(
       new AppError('you are not logged in! please log in to get access.', 401),
@@ -72,6 +71,8 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 
   //2) verification token
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+  console.log(decoded);
 
   //3) check if user still exists
 
