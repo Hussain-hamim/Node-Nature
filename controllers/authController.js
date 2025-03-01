@@ -40,7 +40,7 @@ exports.login = async (req, res, next) => {
   }
 
   // check if user exists && and password is correct
-  const user = await User.findOne({ email: email }).select('+password'); // since we selected: false password in userModel so we have fetch it here with '+password'
+  const user = await User.findOne({ email: email }).select('+password'); // since we (selected: false) password in userModel so we have to fetch it here with '+password'
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError('incorrect email or password', 401));
   }

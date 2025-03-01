@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const AppError = require('../utils/appError');
 
 const handleCastErrorDB = (err) => {
@@ -47,7 +48,7 @@ const sendErrorProd = (err, res) => {
   }
 };
 
-module.exports = (err, req, res, next) => {
+module.exports = (err, req, res) => {
   // if the err object could not find any value for status and code then it will run this default value
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';

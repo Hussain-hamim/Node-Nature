@@ -1,4 +1,3 @@
-const fs = require('fs');
 const Tour = require('./../models/tourModel');
 const APIFeatures = require('./../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
@@ -31,7 +30,7 @@ exports.aliasTopTours = (req, res, next) => {
   next();
 };
 
-exports.getAllTour = catchAsync(async (req, res, next) => {
+exports.getAllTour = catchAsync(async (req, res) => {
   // // BUILD THE QUERY
   // // // 1a. filtering
   // // const queryObj = { ...req.query };
@@ -135,7 +134,7 @@ exports.createTour = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.updateTour = catchAsync(async (req, res) => {
+exports.updateTour = catchAsync(async (req, res, next) => {
   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
@@ -163,7 +162,7 @@ exports.deleteTour = catchAsync(async (req, res, next) => {
 });
 
 // aggregation pipeline [grouping, matching]:
-exports.getTourStats = catchAsync(async (req, res, next) => {
+exports.getTourStats = catchAsync(async (req, res) => {
   const stats = await Tour.aggregate([
     { $match: { ratingAverage: { $gte: 4.5 } } },
     {
@@ -193,7 +192,7 @@ exports.getTourStats = catchAsync(async (req, res, next) => {
 });
 
 // aggregation pipeline [unwind, grouping, matching]:
-exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
+exports.getMonthlyPlan = catchAsync(async (req, res) => {
   const year = req.params.year * 1;
 
   const plan = await Tour.aggregate([
