@@ -1,7 +1,9 @@
+const dotenv = require('dotenv');
+dotenv.config();
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
-const AppError = require('./../utils/appError');
 const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
