@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const dotenv = require('dotenv');
 dotenv.config();
 const jwt = require('jsonwebtoken');
@@ -11,7 +12,7 @@ const signToken = (id) => {
   });
 };
 
-exports.signUp = catchAsync(async (req, res, next) => {
+exports.signUp = catchAsync(async (req, res) => {
   const newUser = await User.create({
     name: req.body.name,
     email: req.body.email,
@@ -39,8 +40,7 @@ exports.login = async (req, res, next) => {
   }
 
   // check if user exists && and password is correct
-  const user = await User.findOne({ email: email }).select('+password');
-
+  const user = await User.findOne({ email: email }).select('+password'); // since we selected: false password in userModel so we have fetch it here with '+password'
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError('incorrect email or password', 401));
   }
