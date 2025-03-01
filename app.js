@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const express = require('express');
 const morgan = require('morgan');
 
@@ -20,11 +21,11 @@ app.use(express.static('./public'));
 //   next();
 // });
 
-// app.use((req, res, next) => {
-//   req.requestTime = new Date().toISOString();
-
-//   next();
-// });
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
+  // console.log(req.headers);
+  next();
+});
 
 // mounting routers
 app.use('/api/v1/tours', tourRouter); // create a small sub system for each resources
