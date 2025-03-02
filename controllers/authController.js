@@ -56,6 +56,7 @@ exports.login = async (req, res, next) => {
   });
 };
 
+// this middleware protect private routes
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) getting toke and check if its there
   let token;
@@ -73,23 +74,24 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   //2) verification token
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+  // const decoded = jwt.verify(token, process.env.JWT_SECRET); // this is the same as above
 
   //3) check if user still exists
-  const freshUser = await User.findById(decoded.id);
-  if (!freshUser) {
+  const currentUser = await User.findById(decoded.id);
+  if (!currentUser) {
     return next(
       new AppError('the user belong to this token no longer exist', 401),
     );
   }
 
   //4) check if user changed password after teh token was issued
-  if (freshUser.changedPasswordAfter(decoded.iat)) {
+  if (currentUser.changedPasswordAfter(decoded.iat)) {
     return next(
       new AppError('user recently changed password! please log in again.', 401),
     );
   }
 
   // GRANT ACCESS TO THE PROTECTED ROUTES
-  req.user = freshUser;
+  req.user = currentUser;
   next();
 });
