@@ -26,8 +26,8 @@ exports.signUp = catchAsync(async (req, res) => {
 
   res.status(201).json({
     status: 'success',
+    token,
     data: {
-      token,
       user: newUser,
     },
   });
@@ -95,3 +95,16 @@ exports.protect = catchAsync(async (req, res, next) => {
   req.user = currentUser;
   next();
 });
+
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    // role: ['admin', 'lead-guide'] role='user'
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError('you do not have permission to perform this action', 403),
+      );
+    }
+    // this middleware only allow to admin user to delete a tour
+    next();
+  };
+};
