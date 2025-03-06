@@ -3,9 +3,10 @@ const dotenv = require('dotenv');
 dotenv.config();
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
+const AppError = require('../utils/appError');
+const sendEmail = require('../utils/email');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -121,13 +122,32 @@ exports.forgotPassword = async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   //3) send it to user email
+  const resetURL = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
 
-  res.status('200').json({
-    status: 'success',
-    message: 'done reset password',
-  });
+  const message = `Forgot your password? submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
 
-  next();
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: 'your password reset token (valid for 10 min)',
+      message,
+    });
+
+    res.status('200').json({
+      status: 'success',
+      message: 'token sent to email',
+    });
+    // eslint-disable-next-line no-unused-vars
+  } catch (err) {
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    return next(
+      new AppError('there was an error sending the email. try again later!'),
+      500,
+    );
+  }
 };
 
 exports.resetPassword = async (req, res, next) => {

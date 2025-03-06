@@ -14,7 +14,15 @@
     "no-underscore-dangle": "off",
     "class-methods-use-this": "off",
     "prefer-destructuring": ["error", { "object": true, "array": false }],
-    // "no-unused-vars": ["error", { "argsIgnorePattern": "req|res|next|val" }]
-    "no-unused-vars": "off"
+    "no-unused-vars": ["error", { "argsIgnorePattern": "req|res|next|val" }]
+    // "no-unused-vars": "off"
+    // "no-undef": "off"
+  },
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "globals": {
+    "process": "readonly"
   }
 }
