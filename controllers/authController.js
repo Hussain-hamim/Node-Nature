@@ -15,6 +15,18 @@ const signToken = (id) => {
   });
 };
 
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
 exports.signUp = catchAsync(async (req, res) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -24,15 +36,7 @@ exports.signUp = catchAsync(async (req, res) => {
     passwordChangedAt: req.body.passwordChangedAt,
   });
 
-  const token = signToken(newUser._id);
-
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  createSendToken(newUser, 201, res);
 });
 
 exports.login = async (req, res, next) => {
@@ -50,12 +54,7 @@ exports.login = async (req, res, next) => {
   }
 
   // if everything ok, send token to client
-  const token = signToken(user._id);
-
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  createSendToken(user, 200, res);
 };
 
 // this middleware protect private routes
@@ -178,10 +177,23 @@ exports.resetPassword = async (req, res, next) => {
   //
 
   //4) log the user in, send jwt
-  const token = signToken(user._id);
+  createSendToken(user, 200, res);
+};
 
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+exports.updatePassword = async (req, res, next) => {
+  //1) get the user from the collection
+  const user = await User.findById(req.user.id).select('+password'); // if we are logged in so we can find user in req
+
+  //2) check if posted current password is correct with password in db, correctPassword use bcrypt.compare method
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError('your current password is wrong'));
+  }
+
+  //3)if you come this far, if so update the password
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save(); // this User.findByIdAndUpdate() will not work as intended!
+
+  //4) log user in, send jwt
+  createSendToken(user, 200, res);
 };
