@@ -13,7 +13,7 @@ const filterObj = (obj, ...allowedFields) => {
 exports.getAllUsers = catchAsync(async (req, res) => {
   const users = await User.find();
 
-  res.status(500).json({
+  res.status(200).json({
     status: 'success',
     results: users.length,
     data: {
@@ -40,6 +40,8 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     );
   }
 
+  exports.dele;
+
   //2) update user doc
   const filteredBody = filterObj(req.body, 'name', 'email'); // this will filter out the fields that are not allowed to be updated  like password and role and so on
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
@@ -54,6 +56,14 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     data: {
       user: updatedUser,
     },
+  });
+});
+
+exports.deleteMe = catchAsync(async (req, res, next) => {
+  await User.findByIdAndUpdate(req.user.id, { active: false });
+  res.status(204).json({
+    status: 'success',
+    data: null,
   });
 });
 
