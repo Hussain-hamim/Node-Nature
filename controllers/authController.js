@@ -29,7 +29,7 @@ const createSendToken = (user, statusCode, res) => {
     cookieOptions.secure = true;
   }
 
-  user.password = undefined; // remove from the output
+  user.password = undefined;
 
   res.cookie('jwt', token, cookieOptions);
 
