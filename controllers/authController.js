@@ -126,7 +126,7 @@ exports.restrictTo = (...roles) => {
 };
 
 exports.forgotPassword = async (req, res, next) => {
-  //1) find user
+  //1) Find User by Email: check if user exist with this email
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
     return next(new AppError('there is no user with this email', 404));
@@ -136,8 +136,9 @@ exports.forgotPassword = async (req, res, next) => {
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
-  //3) send it to user email e.g. //https://localhost/api/v1/user/resetPassword/98kljf94kj49093484jk
+  //3) send it to user email e.g. //https://localhost/api/v1/user/resetPassword/98kljf94kj49093484jk //////https://example.com/api/v1/users/resetPassword/1234567890abcdef
   const resetURL = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
+  // protocol: http or https, host: localhost:3000 or 8080,  req.get('host') method retrieves the host name from the request headers
 
   const message = `Forgot your password? submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
 
