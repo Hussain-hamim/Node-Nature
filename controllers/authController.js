@@ -57,18 +57,18 @@ exports.signUp = catchAsync(async (req, res) => {
 exports.login = async (req, res, next) => {
   const { email, password } = req.body;
 
-  // check if email and password exists
+  //1) check if email and password exists
   if (!email || !password) {
     return next(new AppError('Please provide email and password', 400));
   }
 
-  // check if user exists && and password is correct
+  //2) check if user exists && and password is correct
   const user = await User.findOne({ email: email }).select('+password'); // since we (selected: false) password in userModel so we have to fetch it here with '+password'
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError('incorrect email or password', 401));
   }
 
-  // if everything ok, send token to client
+  //3) if everything ok, send token to client
   createSendToken(user, 200, res);
 };
 
@@ -126,6 +126,7 @@ exports.restrictTo = (...roles) => {
 };
 
 exports.forgotPassword = async (req, res, next) => {
+  //1) find user
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
     return next(new AppError('there is no user with this email', 404));
@@ -133,10 +134,9 @@ exports.forgotPassword = async (req, res, next) => {
 
   //2) generate the random reset token
   const resetToken = user.createPasswordResetToken();
-  console.log(resetToken);
   await user.save({ validateBeforeSave: false });
 
-  //3) send it to user email
+  //3) send it to user email e.g. //https://localhost/api/v1/user/resetPassword/98kljf94kj49093484jk
   const resetURL = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
 
   const message = `Forgot your password? submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;

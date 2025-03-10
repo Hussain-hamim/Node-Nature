@@ -80,7 +80,7 @@ userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword,
 ) {
-  return await bcrypt.compare(candidatePassword, userPassword);
+  return await bcrypt.compare(candidatePassword, userPassword); // compare a string password with a encrypted password
 };
 
 userSchema.methods.changedPasswordAfter = function (JWTTimeStamp) {
@@ -104,8 +104,8 @@ userSchema.methods.createPasswordResetToken = function () {
     .update(resetToken)
     .digest('hex');
 
-  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
-  console.log({ resetToken }, this.passwordResetToken);
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 mins
+  // console.log({ resetToken }, this.passwordResetToken);
   return resetToken;
 };
 
