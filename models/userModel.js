@@ -33,9 +33,10 @@ const userSchema = new mongoose.Schema({
     validate: {
       // This only works on CREATE and SAVE!!!
       validator: function (el) {
-        return el === this.password;
+        return el === this.password; // the confirmPassword should be same as password, this validator is not as the imported one this is built in to mongoose schema
       },
-      message: 'Passwords are not the same!',
+      message:
+        'Passwords are not the same!, please make sure password are the same',
     },
   },
   passwordChangedAt: Date,
@@ -48,6 +49,7 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+//PRE HOOKS MIDDLEWARE
 userSchema.pre('save', async function (next) {
   // this run only if password only actually was modified
   if (!this.isModified('password')) return next();
@@ -62,16 +64,18 @@ userSchema.pre('save', async function (next) {
 userSchema.pre('save', function (next) {
   if (!this.isModified('password') || this.isNew) return next();
 
-  this.passwordChangedAt = Date.now() - 1000;
+  this.passwordChangedAt = Date.now() - 1000; // one sec after now
   next();
 });
 
+// this run before each query that start with 'find' like findOne, findMany
 userSchema.pre(/^find/, function (next) {
   // this points to the current query
   this.find({ active: { $ne: false } });
   next();
 });
 
+// INSTANCE METHODS
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword,
@@ -85,7 +89,6 @@ userSchema.methods.changedPasswordAfter = function (JWTTimeStamp) {
       this.passwordChangedAt.getTime() / 100,
       10,
     );
-
     // console.log(changedTimeStamp, JWTTimeStamp);
     return JWTTimeStamp < changedTimeStamp; // this determine by time that if password is changed or not
   }
