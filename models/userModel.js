@@ -61,6 +61,7 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+//update changedPasswordAt property for the user -- this run on resetPassword route 3rd step
 userSchema.pre('save', function (next) {
   if (!this.isModified('password') || this.isNew) return next();
 

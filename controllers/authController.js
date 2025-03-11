@@ -182,15 +182,15 @@ exports.resetPassword = async (req, res, next) => {
   if (!user) {
     return next(new AppError('Token is invalid or has expired', 400));
   }
+
   user.password = req.body.password;
   user.passwordConfirm = req.body.passwordConfirm;
-  user.passwordResetToken = req.body.passwordResetToken;
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
   await user.save();
 
   //3) update changedPasswordAt property for the user
-  //
+  // this is handled by pre hook middleware
 
   //4) log the user in, send jwt
   createSendToken(user, 200, res);
