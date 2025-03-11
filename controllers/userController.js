@@ -40,8 +40,6 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     );
   }
 
-  exports.dele;
-
   //2) update user doc
   const filteredBody = filterObj(req.body, 'name', 'email'); // this will filter out the fields that are not allowed to be updated  like password and role and so on
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {

@@ -74,7 +74,7 @@ exports.login = async (req, res, next) => {
 
 // this middleware protect private routes
 exports.protect = catchAsync(async (req, res, next) => {
-  // 1) getting toke and check if its there
+  // 1) getting token and check if its there
   let token;
   if (
     req.headers.authorization &&
@@ -107,7 +107,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
 
-  // GRANT ACCESS TO THE PROTECTED ROUTES
+  // TODO: Done, GRANT ACCESS TO THE PROTECTED ROUTES
   req.user = currentUser;
   next();
 });
