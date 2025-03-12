@@ -11,6 +11,7 @@ const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
+const reviewRouter = require('./routes/reviewRoutes');
 
 const app = express();
 
@@ -66,6 +67,7 @@ app.use((req, res, next) => {
 // mounting routers
 app.use('/api/v1/tours', tourRouter); // create a small sub system for each resources
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 // route for all undefined routes to give error message
 app.all('*', (req, res, next) => {
