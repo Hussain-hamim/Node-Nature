@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+const User = require('./userModel');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -63,6 +64,20 @@ const tourSchema = new mongoose.Schema(
       address: String,
       description: String,
     },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+    guides: Array,
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } },
 );
@@ -79,6 +94,13 @@ tourSchema.virtual('uppName').get(function () {
 tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
   next(); // this will run before we save doc to db
+});
+
+tourSchema.pre('save', async function (next) {
+  const guidesPromises = this.guides.map(async (id) => User.findById(id)); // this will give us promises so we have to await Promise.all to resolve it
+  this.guides = await Promise.all(guidesPromises); // this pre hook embed the user document with given user-guide id and it will add objects of array
+
+  next();
 });
 
 // tourSchema.post('save', function (doc, next) {
