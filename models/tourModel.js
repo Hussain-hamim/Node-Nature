@@ -97,6 +97,7 @@ tourSchema.pre('save', function (next) {
 });
 
 tourSchema.pre('save', async function (next) {
+  // embedded another document .e.g embed User inside Tour
   const guidesPromises = this.guides.map(async (id) => User.findById(id)); // this will give us promises so we have to await Promise.all to resolve it
   this.guides = await Promise.all(guidesPromises); // this pre hook embed the user document with given user-guide id and it will add objects of array
 
