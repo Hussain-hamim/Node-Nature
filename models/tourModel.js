@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
-const User = require('./userModel');
+// const User = require('./userModel');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -77,7 +77,12 @@ const tourSchema = new mongoose.Schema(
         day: Number,
       },
     ],
-    guides: Array,
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User', // referencing
+      },
+    ],
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } },
 );
@@ -96,13 +101,13 @@ tourSchema.pre('save', function (next) {
   next(); // this will run before we save doc to db
 });
 
-tourSchema.pre('save', async function (next) {
-  // embedded another document .e.g embed User inside Tour
-  const guidesPromises = this.guides.map(async (id) => User.findById(id)); // this will give us promises so we have to await Promise.all to resolve it
-  this.guides = await Promise.all(guidesPromises); // this pre hook embed the user document with given user-guide id and it will add objects of array
+// tourSchema.pre('save', async function (next) {
+//   // embedded another document .e.g embed User inside Tour
+//   const guidesPromises = this.guides.map(async (id) => User.findById(id)); // this will give us promises so we have to await Promise.all to resolve it
+//   this.guides = await Promise.all(guidesPromises); // this pre hook embed the user document with given user-guide id and it will add objects of array
 
-  next();
-});
+//   next();
+// });
 
 // tourSchema.post('save', function (doc, next) {
 //   // console.log(doc);// current saved doc
