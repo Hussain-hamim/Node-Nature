@@ -2,10 +2,7 @@ const Review = require('../models/reviewModel');
 const catchAsync = require('../utils/catchAsync');
 
 exports.getAllReview = catchAsync(async (req, res, next) => {
-  const reviews = await Review.find().populate({
-    path: 'tour',
-    select: 'name',
-  });
+  const reviews = await Review.find();
 
   res.status(200).json({
     status: 'success',
