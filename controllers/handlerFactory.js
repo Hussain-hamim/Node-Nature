@@ -31,3 +31,17 @@ exports.updateOne = (Model) =>
       },
     });
   });
+
+exports.createOne = (Model) =>
+  catchAsync(async (req, res, next) => {
+    const newDoc = await Model.create(req.body); // newdoc.save(); // create do this two line at the same time  // const newdoc = new doc({});
+
+    if (!newDoc) return next(new AppError('doc not found with given id', 404));
+
+    res.status(201).json({
+      status: 'success',
+      data: {
+        data: newDoc,
+      },
+    });
+  });
