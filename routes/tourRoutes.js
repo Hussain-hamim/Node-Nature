@@ -32,12 +32,13 @@ router
 //POST /tour/3i3j43/reviews
 //GET /tour/3i3j43/reviews
 //GET /tour/3i3j43/reviews/9r9930re9e
-
+// for nested route
 router
   .route('/:tourId/reviews')
   .post(
     authController.protect,
-    authController.restrictTo('users', reviewController.createReview),
+    authController.restrictTo('user'),
+    reviewController.createReview,
   );
 
 module.exports = router;
