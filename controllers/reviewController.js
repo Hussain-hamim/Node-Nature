@@ -14,6 +14,8 @@ exports.getAllReview = catchAsync(async (req, res, next) => {
 });
 
 exports.createReview = catchAsync(async (req, res, next) => {
+  if (!req.body.tour) req.body.tour = req.params.tourId;
+
   const newReview = await Review.create(req.body);
 
   res.status(201).json({
