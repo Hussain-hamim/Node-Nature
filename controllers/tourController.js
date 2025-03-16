@@ -1,9 +1,86 @@
 const Tour = require('./../models/tourModel');
-const APIFeatures = require('./../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
 
+exports.aliasTopTours = (req, res, next) => {
+  req.query.limit = '5';
+  req.query.sort = '-ratingAverage,price';
+  req.query.fields = 'name,price,ratingAverage,summary,difficulty';
+  next();
+};
+
+exports.getAllTour = factory.getAll(Tour);
+exports.getTour = factory.getOne(Tour, { path: 'reviews' }); // with populate options
+exports.createTour = factory.createOne(Tour);
+exports.updateTour = factory.updateOne(Tour);
+exports.deleteTour = factory.deleteOne(Tour);
+
+// aggregation pipeline [grouping, matching]:
+exports.getTourStats = catchAsync(async (req, res) => {
+  const stats = await Tour.aggregate([
+    { $match: { ratingAverage: { $gte: 4.5 } } },
+    {
+      $group: {
+        _id: { $toUpper: '$difficulty' },
+        // _id: '$ratingAverage',
+        numTours: { $sum: 1 },
+        numRating: { $sum: '$ratingQuantity' },
+        avgRating: { $avg: '$ratingAverage' },
+        avgPrice: { $avg: '$price' },
+        minPrice: { $min: '$price' },
+        maxPrice: { $max: '$price' },
+      },
+    },
+    {
+      $sort: { avgPrice: 1 },
+    },
+    // {  $match: { _id: { $ne: 'EASY' } }, // not equal }
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data: stats,
+  });
+});
+
+// aggregation pipeline [unwind, grouping, matching]:
+exports.getMonthlyPlan = catchAsync(async (req, res) => {
+  const year = req.params.year * 1;
+
+  const plan = await Tour.aggregate([
+    { $unwind: '$startDates' },
+    {
+      $match: {
+        startDates: {
+          $gte: new Date(`${year}-1-1`),
+          $lte: new Date(`${year}-12-31`),
+        },
+      },
+    },
+    {
+      $group: {
+        _id: { $month: '$startDates' },
+        numTourStart: { $sum: 1 }, // count docs
+        tours: { $push: '$name' }, // this create an array and push element to it
+      },
+    },
+    { $addFields: { month: '$_id' } }, // add field --- in _id field before we saved the startDates month
+    { $project: { _id: 0 } }, // here we hide the _id field by 0 // projecting is for like selecting
+    { $sort: { numTourStart: -1 } },
+    { $limit: 12 },
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data: plan,
+  });
+});
+
+//
+
+//
+
+//////////////// PRACTICE CODE:
 // const tours = JSON.parse(fs.readFileSync('./dev-data/data/tours-simple.json'));
 
 // exports.checkID = (req, res, next, val) => {
@@ -24,12 +101,11 @@ const factory = require('./handlerFactory');
 //   next();
 // };
 
-exports.aliasTopTours = (req, res, next) => {
-  req.query.limit = '5';
-  req.query.sort = '-ratingAverage,price';
-  req.query.fields = 'name,price,ratingAverage,summary,difficulty';
-  next();
-};
+//
+
+///////////////
+
+//
 
 // exports.getAllTour = catchAsync(async (req, res) => {
 // // BUILD THE QUERY
@@ -95,88 +171,3 @@ exports.aliasTopTours = (req, res, next) => {
 
 // this is a class and we have define its object here so we called all method in that class
 // and every methods return THIS which mean that we can chain query on it, this class constructor take two args query and req query object
-
-exports.getAllTour = catchAsync(async (req, res) => {
-  const features = new APIFeatures(Tour.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-
-  const tours = await features.query;
-
-  // SEND RESPONSE
-  res.status(200).json({
-    status: 'success',
-    results: tours.length,
-    data: { tours },
-  });
-});
-
-exports.getTour = factory.getOne(Tour, { path: 'reviews' }); // with populate options
-exports.createTour = factory.createOne(Tour);
-exports.updateTour = factory.updateOne(Tour);
-exports.deleteTour = factory.deleteOne(Tour);
-
-// aggregation pipeline [grouping, matching]:
-exports.getTourStats = catchAsync(async (req, res) => {
-  const stats = await Tour.aggregate([
-    { $match: { ratingAverage: { $gte: 4.5 } } },
-    {
-      $group: {
-        _id: { $toUpper: '$difficulty' },
-        // _id: '$ratingAverage',
-        numTours: { $sum: 1 },
-        numRating: { $sum: '$ratingQuantity' },
-        avgRating: { $avg: '$ratingAverage' },
-        avgPrice: { $avg: '$price' },
-        minPrice: { $min: '$price' },
-        maxPrice: { $max: '$price' },
-      },
-    },
-    {
-      $sort: { avgPrice: 1 },
-    },
-    // {
-    //   $match: { _id: { $ne: 'EASY' } }, // not equal
-    // },
-  ]);
-
-  res.status(200).json({
-    status: 'success',
-    data: stats,
-  });
-});
-
-// aggregation pipeline [unwind, grouping, matching]:
-exports.getMonthlyPlan = catchAsync(async (req, res) => {
-  const year = req.params.year * 1;
-
-  const plan = await Tour.aggregate([
-    { $unwind: '$startDates' },
-    {
-      $match: {
-        startDates: {
-          $gte: new Date(`${year}-1-1`),
-          $lte: new Date(`${year}-12-31`),
-        },
-      },
-    },
-    {
-      $group: {
-        _id: { $month: '$startDates' },
-        numTourStart: { $sum: 1 }, // count docs
-        tours: { $push: '$name' }, // this create an array and push element to it
-      },
-    },
-    { $addFields: { month: '$_id' } }, // add field --- in _id field before we saved the startDates month
-    { $project: { _id: 0 } }, // here we hide the _id field by 0 // projecting is for like selecting
-    { $sort: { numTourStart: -1 } },
-    { $limit: 12 },
-  ]);
-
-  res.status(200).json({
-    status: 'success',
-    data: plan,
-  });
-});
