@@ -11,18 +11,6 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 }; // this function will filter out the fields that are not allowed to be updated  like password
 
-exports.getAllUsers = catchAsync(async (req, res) => {
-  const users = await User.find();
-
-  res.status(200).json({
-    status: 'success',
-    results: users.length,
-    data: {
-      users: users,
-    },
-  });
-});
-
 exports.createUser = (req, res) => {
   res.status(500).json({
     status: 'error',
@@ -67,12 +55,13 @@ exports.deleteMe = catchAsync(async (req, res) => {
   });
 });
 
-exports.getUser = factory.getOne(User);
-
 exports.getMe = (req, res, next) => {
   req.params.id = req.user.id;
   next();
 };
+
+exports.getUser = factory.getOne(User);
+exports.getAllUsers = factory.getAll(User);
 
 // do not update password with this
 exports.updateUser = factory.updateOne(User);
