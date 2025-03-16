@@ -31,70 +31,72 @@ exports.aliasTopTours = (req, res, next) => {
   next();
 };
 
+// exports.getAllTour = catchAsync(async (req, res) => {
+// // BUILD THE QUERY
+// // // 1a. filtering
+// // const queryObj = { ...req.query };
+// // const excludedFields = ['page', 'sort', 'limit', 'fields']; // this fields will be excluded from the query param even if we specify
+// // excludedFields.forEach((el) => delete queryObj[el]);
+
+// // // 1b. advanced filtering
+// // let queryStr = JSON.stringify(queryObj); // filtering in querying
+// // // we take the query oject and add $ cuz that what query object give us except that we need $ to add to filter correctly in database e.g. {duration: {$gt: 5}}
+// // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`); // we send query from postman like this: http://127.0.0.1:8000/api/v1/tours?duration[gt]=5&price[lt]=1500
+
+// // // const allTours = await Tour.find({ duration: 5, difficulty: 'easy' });
+// // let query = Tour.find(JSON.parse(queryStr));
+
+// // // 2. SORTING
+// // if (req.query.sort) {
+// //   const sortBy = req.query.sort.split(',').join(' '); // if someone send like; /api/v1/tours?sort=price,ratingAverage then we turn that , to space so sort become like this sort('price ratingsAverage')
+// //   query = query.sort(sortBy); // we can send req like this: .../api/tours?sort=price or -price for descending order
+// //   // sort(price ratingAverage)
+// // } else {
+// //   query = query.sort('-createdAt');
+// // }
+
+// // // 3. FIELDS
+// // if (req.query.fields) {
+// //   const fields = req.query.fields.split(',').join(' ');
+// //   query = query.select(fields);
+// // } else {
+// //   query = query.select('-__v');
+// // }
+
+// // // 4. PAGINATION
+// // const page = req.query.page * 1 || 1; // we also set default value
+// // const limit = req.query.limit * 1 || 100; // we multiply the query with 1 so that we convert the number in string passed to to number e.g. '1' * 1 = 1
+// // const skip = (page - 1) * limit; // prev page * limit = skip
+
+// // // page=3&limit=10 1-10 page 1, 11-20 page 2, 21-30 page 3
+// // query = query.skip(skip).limit(limit);
+// // // if we requested a page that do not exists:
+// // if (req.query.page) {
+// //   const toursCount = await Tour.countDocuments();
+// //   if (skip >= toursCount) throw new Error('this page does not exists.'); // we throw the error here so catch block will catch it
+// // }
+
+// // 5. ALIASING
+// //http://127.0.0.1:8000/api/v1/tours?limit=5&sort=-ratingAverage,price  // this query could be for top five tours
+//http://127.0.0.1:8000/api/v1/tours?limit=5&sort=-ratingAverage,price ====> http://127.0.0.1:8000/api/v1/tours/top-five-tours
+
+// // const allTours = await Tour.find()
+// //   .where('duration')
+// //   .equals(5)
+// //   .where('difficulty')
+// //   .equals('easy');
+
+// // EXECUTE THE QUERY
+// const features = new APIFeatures(Tour.find(), req.query)
+//   .filter()
+//   .sort()
+//   .limitFields()
+//   .paginate();
+
+// this is a class and we have define its object here so we called all method in that class
+// and every methods return THIS which mean that we can chain query on it, this class constructor take two args query and req query object
+
 exports.getAllTour = catchAsync(async (req, res) => {
-  // // BUILD THE QUERY
-  // // // 1a. filtering
-  // // const queryObj = { ...req.query };
-  // // const excludedFields = ['page', 'sort', 'limit', 'fields']; // this fields will be excluded from the query param even if we specify
-  // // excludedFields.forEach((el) => delete queryObj[el]);
-
-  // // // 1b. advanced filtering
-  // // let queryStr = JSON.stringify(queryObj); // filtering in querying
-  // // // we take the query oject and add $ cuz that what query object give us except that we need $ to add to filter correctly in database e.g. {duration: {$gt: 5}}
-  // // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`); // we send query from postman like this: http://127.0.0.1:8000/api/v1/tours?duration[gt]=5&price[lt]=1500
-
-  // // // const allTours = await Tour.find({ duration: 5, difficulty: 'easy' });
-  // // let query = Tour.find(JSON.parse(queryStr));
-
-  // // // 2. SORTING
-  // // if (req.query.sort) {
-  // //   const sortBy = req.query.sort.split(',').join(' '); // if someone send like; /api/v1/tours?sort=price,ratingAverage then we turn that , to space so sort become like this sort('price ratingsAverage')
-  // //   query = query.sort(sortBy); // we can send req like this: .../api/tours?sort=price or -price for descending order
-  // //   // sort(price ratingAverage)
-  // // } else {
-  // //   query = query.sort('-createdAt');
-  // // }
-
-  // // // 3. FIELDS
-  // // if (req.query.fields) {
-  // //   const fields = req.query.fields.split(',').join(' ');
-  // //   query = query.select(fields);
-  // // } else {
-  // //   query = query.select('-__v');
-  // // }
-
-  // // // 4. PAGINATION
-  // // const page = req.query.page * 1 || 1; // we also set default value
-  // // const limit = req.query.limit * 1 || 100; // we multiply the query with 1 so that we convert the number in string passed to to number e.g. '1' * 1 = 1
-  // // const skip = (page - 1) * limit; // prev page * limit = skip
-
-  // // // page=3&limit=10 1-10 page 1, 11-20 page 2, 21-30 page 3
-  // // query = query.skip(skip).limit(limit);
-  // // // if we requested a page that do not exists:
-  // // if (req.query.page) {
-  // //   const toursCount = await Tour.countDocuments();
-  // //   if (skip >= toursCount) throw new Error('this page does not exists.'); // we throw the error here so catch block will catch it
-  // // }
-
-  // // 5. ALIASING
-  // //http://127.0.0.1:8000/api/v1/tours?limit=5&sort=-ratingAverage,price  // this query could be for top five tours
-  //http://127.0.0.1:8000/api/v1/tours?limit=5&sort=-ratingAverage,price ====> http://127.0.0.1:8000/api/v1/tours/top-five-tours
-
-  // // const allTours = await Tour.find()
-  // //   .where('duration')
-  // //   .equals(5)
-  // //   .where('difficulty')
-  // //   .equals('easy');
-
-  // // EXECUTE THE QUERY
-  // const features = new APIFeatures(Tour.find(), req.query)
-  //   .filter()
-  //   .sort()
-  //   .limitFields()
-  //   .paginate();
-
-  // this is a class and we have define its object here so we called all method in that class
-  // and every methods return THIS which mean that we can chain query on it, this class constructor take two args query and req query object
   const features = new APIFeatures(Tour.find(), req.query)
     .filter()
     .sort()
@@ -111,31 +113,10 @@ exports.getAllTour = catchAsync(async (req, res) => {
   });
 });
 
-exports.getTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id).populate('reviews');
-
-  if (!tour) return next(new AppError('tour not found with given id', 404));
-
-  res.status(200).json({
-    status: 'success',
-    data: { tour },
-  });
-});
-
+exports.getTour = factory.getOne(Tour, { path: 'reviews' }); // with populate options
 exports.createTour = factory.createOne(Tour);
 exports.updateTour = factory.updateOne(Tour);
 exports.deleteTour = factory.deleteOne(Tour);
-//
-// exports.deleteTour = catchAsync(async (req, res, next) => {
-//   const tour = await Tour.findByIdAndDelete(req.params.id);
-
-//   if (!tour) return next(new AppError('tour not found with given id', 404));
-
-//   res.status(204).json({
-//     status: 'success',
-//     data: null,
-//   });
-// });
 
 // aggregation pipeline [grouping, matching]:
 exports.getTourStats = catchAsync(async (req, res) => {
