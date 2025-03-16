@@ -49,7 +49,7 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-//PRE HOOKS MIDDLEWARE
+// PRE HOOKS MIDDLEWARE
 userSchema.pre('save', async function (next) {
   // this run only if password only actually was modified
   if (!this.isModified('password')) return next();
