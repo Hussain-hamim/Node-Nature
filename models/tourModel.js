@@ -88,6 +88,9 @@ const tourSchema = new mongoose.Schema(
   { toJSON: { virtuals: true }, toObject: { virtuals: true } },
 );
 
+tourSchema.index({ price: 1, ratingAverage: -1 });
+tourSchema.index({ slug: 1 });
+
 // virtual populate
 tourSchema.virtual('reviews', {
   ref: 'Review',
