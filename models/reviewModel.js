@@ -52,8 +52,8 @@ reviewSchema.pre(/^find/, function (next) {
   next();
 });
 
-// static method to calculate average rating and quantity
 // this is a static method because we want to call it on the model and not on the document
+// static method to calculate average rating and quantity
 reviewSchema.statics.calcAverageRatings = async function (tourId) {
   const stats = this.aggregate([
     { $match: { tour: tourId } }, // select all reviews that match the tourId
@@ -69,7 +69,7 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
 
   await Tour.findByIdAndUpdate(tourId, {
     ratingQuantity: stats[0].nRating, // stats[0] because stats is an array of objects
-    ratingAverage: stats[0].avgRating,
+    ratingAverage: stats[0].avgRating, // stats[0] because stats is an array of objects
   });
 };
 
@@ -77,6 +77,12 @@ reviewSchema.post('save', function (next) {
   // this points to current review
   this.constructor.calcAverageRatings(this.tour); // this.constructor points to the model that created the document
   next();
+});
+
+reviewSchema.pre(/findOneAnd/, async function () {
+  //
+  const r = await this.findOne();
+  console.log(r);
 });
 
 const Review = mongoose.model('Review', reviewSchema);
