@@ -81,6 +81,8 @@ exports.getTourWithin = async (req, res, next) => {
   const { distance, latlng, unit } = req.params;
   const [lat, lng] = latlng.split(',');
 
+  const radius = unit === 'ml' ? distance / 3963.2 : distance / 6378.1;
+
   if (!lat || !lng) {
     next(
       new AppError(
@@ -96,6 +98,7 @@ exports.getTourWithin = async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
+    results: tours.length,
     data: {
       data: tours,
     },
