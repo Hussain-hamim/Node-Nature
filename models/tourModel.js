@@ -95,6 +95,7 @@ const tourSchema = new mongoose.Schema(
 tourSchema.index({ price: 1, ratingAverage: -1 });
 tourSchema.index({ slug: 1 });
 tourSchema.index({ startLocation: '2dsphere' });
+// tourSchema.index({ Geolocation: '2dsphere' });
 
 // virtual populate
 tourSchema.virtual('reviews', {
@@ -160,11 +161,11 @@ tourSchema.pre('find', function (next) {
 
 // AGGREGATE MIDDLEWARE: mongoose middleware or hook that allow to execute a fn before an aggregation pipeline is executed on model like before Tour.aggregate([])
 // this allow us to enhance the pipeline for all aggregation on the model
-tourSchema.pre('aggregate', function (next) {
-  // inside this fn we can access and modify the aggregation pipeline which is and array of stages
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } }); // we are removing from the output the vip tour with aggregate
-  next();
-});
+// tourSchema.pre('aggregate', function (next) {
+//   // inside this fn we can access and modify the aggregation pipeline which is and array of stages
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } }); // we are removing from the output the vip tour with aggregate
+//   next();
+// });
 
 const Tour = mongoose.model('Tour', tourSchema);
 
