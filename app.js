@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cors = require('cors');
 
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
@@ -16,6 +17,8 @@ const reviewRouter = require('./routes/reviewRoutes');
 const app = express();
 
 //1) GLOBAL MIDDLEWARE
+
+app.use(cors());
 
 // security http headers
 app.use(helmet());

@@ -41,10 +41,11 @@ router.route('/distances/:latlng/unit/:unit').get(tourController.getDistances);
 
 router
   .route('/')
-  .get(authController.protect, tourController.getAllTour)
+  // .get(authController.protect, tourController.getAllTour)
+  .get(tourController.getAllTour)
   .post(
-    authController.protect,
-    authController.restrictTo('admin', 'lead-guide'),
+    // authController.protect,
+    // authController.restrictTo('admin', 'lead-guide'),
     tourController.createTour,
   );
 
@@ -52,12 +53,12 @@ router
   .route('/:id')
   .get(tourController.getTour)
   .patch(
-    authController.protect,
-    authController.restrictTo('admin', 'lead-guide'),
+    // authController.protect,
+    // authController.restrictTo('admin', 'lead-guide'),
     tourController.updateTour,
   )
   .delete(
-    authController.protect,
+    // authController.protect,
     // authController.restrictTo('admin', 'lead-guide'),
     tourController.deleteTour,
   );
