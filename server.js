@@ -18,7 +18,7 @@ const app = require('./app');
 const DB = process.env.DATABASE_LOCAL; //--> mongodb://localhost:27017/natours
 
 mongoose
-  .connect(DB)
+  .connect(process.env.MONGODB_URI)
   .then((con) => {
     console.log('db connection successful!⚡\n');
   })
