@@ -42,10 +42,11 @@ const tourSchema = new mongoose.Schema(
     description: {
       type: String,
       trim: true,
+      default: 'no description',
     },
     imageCover: {
       type: String,
-      required: [true, 'a tou must have a cover image'],
+      // required: [true, 'a tour must have a cover image'],
     },
     images: [String],
     createdAt: {
@@ -57,7 +58,7 @@ const tourSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    startDates: [Date],
+    startDates: { type: [Date], default: Date.now() },
     startLocation: {
       // geoJson
       type: {
