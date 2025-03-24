@@ -18,7 +18,7 @@ const app = require('./app');
 const DB = process.env.DATABASE_LOCAL; //--> mongodb://localhost:27017/natours
 
 const conn =
-  'mongodb+srv://hussain-hamim:hussain-hamim@cluster0.wb9zx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+  'mongodb+srv://hussain-hamim:hamim@cluster0.wb9zx.mongodb.net/nature-quest?retryWrites=true&w=majority&appName=Cluster0';
 
 mongoose
   .connect(process.env.MONGODB_URI)
