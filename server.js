@@ -21,7 +21,7 @@ const conn =
   'mongodb+srv://hussain-hamim:hussain-hamim@cluster0.wb9zx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
 
 mongoose
-  .connect(conn)
+  .connect(process.env.MONGODB_URI)
   .then((con) => {
     console.log('db connection successful!⚡\n');
   })
